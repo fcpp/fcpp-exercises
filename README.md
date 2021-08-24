@@ -20,7 +20,6 @@ Pre-requisites:
 - [Git Bash](https://gitforwindows.org) (for issuing unix-style commands)
 - [MinGW-w64](http://mingw-w64.org) ([builds 8.1.0](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download))
 - [CMake 3.9](https://cmake.org) (or higher)
-- [Asymptote](http://asymptote.sourceforge.io) (for building the plots)
 
 During CMake installation, make sure you select to add `cmake` to the `PATH` (at least for the current user).
 During MinGW installation, make sure you select "posix" threads (should be the default) and not "win32" threads. After installing MinGW, you need to add its path to the environment variable `PATH`. The default path should be:
@@ -35,11 +34,10 @@ Pre-requisites:
 - Xorg-dev package (X11)
 - G++ 9 (or higher)
 - CMake 3.9 (or higher)
-- Asymptote (for building the plots)
 
 To install these packages in Ubuntu, type the following command:
 ```
-sudo apt-get install xorg-dev g++ cmake asymptote
+sudo apt-get install xorg-dev g++ cmake
 ```
 
 ### MacOS
@@ -47,12 +45,11 @@ sudo apt-get install xorg-dev g++ cmake asymptote
 Pre-requisites:
 - Xcode Command Line Tools
 - CMake 3.9 (or higher)
-- [Asymptote](http://asymptote.sourceforge.io) (for building the plots)
 
 To install them, assuming you have the [brew](https://brew.sh) package manager, type the following commands:
 ```
 xcode-select --install
-brew install cmake asymptote
+brew install cmake
 ```
 
 
