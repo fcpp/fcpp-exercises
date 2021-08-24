@@ -77,6 +77,7 @@ Executing a graphical simulation will open a window displaying the simulation sc
 - `mouse scroll` for zooming in and out
 - `left-shift` added to the camera commands above for precision control
 - any other key will show/hide a legenda displaying this list
+Hovering on a node will also display its UID in the top-left corner.
 
 
 ## Project Inspection
