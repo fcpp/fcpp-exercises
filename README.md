@@ -18,7 +18,7 @@ The next sections contain the FCPP setup instructions for the various supported 
 
 Pre-requisites:
 - [Git Bash](https://gitforwindows.org) (for issuing unix-style commands)
-- [MinGW-w64](http://mingw-w64.org) [builds 8.1.0](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download)
+- [MinGW-w64](http://mingw-w64.org) ([builds 8.1.0](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download))
 - [CMake 3.9](https://cmake.org) (or higher)
 - [Asymptote](http://asymptote.sourceforge.io) (for building the plots)
 
