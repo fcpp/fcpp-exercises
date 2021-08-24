@@ -12,13 +12,13 @@ Quick-start aggregate computing exercises. The exercises are described in the `r
 
 ## Setup
 
-The next sections contain the FCPP setup instructions for the various supported OSs.
+The next sections contain the FCPP setup instructions for the various supported OSs. Jump to the section dedicated to your system of choice and ignore the others.
 
 ### Windows
 
 Pre-requisites:
 - [Git Bash](https://gitforwindows.org) (for issuing unix-style commands)
-- [MinGW-w64 builds 8.1.0](http://mingw-w64.org/doku.php/download/mingw-builds)
+- [MinGW-w64](http://mingw-w64.org) [builds 8.1.0](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download)
 - [CMake 3.9](https://cmake.org) (or higher)
 - [Asymptote](http://asymptote.sourceforge.io) (for building the plots)
 
@@ -80,3 +80,16 @@ Executing a graphical simulation will open a window displaying the simulation sc
 - `mouse scroll` for zooming in and out
 - `left-shift` added to the camera commands above for precision control
 - any other key will show/hide a legenda displaying this list
+
+
+## Project Inspection
+
+This project consists of four files (besides git configuration files):
+- `run/exercises.cpp`. This contains the actual C++ code (using the FCPP library) that will be run. In-line documentation is provided to show the purpose of its various parts.
+- `CMakeLists.txt`. This contains the CMake configuration for the project. The first four lines ensure that the FCPP library is properly loaded. After defining the project, the execution target can be declared through:
+  ```
+  fcpp_target(executable_name source_path has_gui)
+  ```
+  where `has_gui` can be either `ON` or `OFF`.
+- `make.sh`. This script provides a friendly interface to the build and execution tools. Launching `./make.sh` without arguments shows the relevant help.
+- `README.md`, which is this file.
