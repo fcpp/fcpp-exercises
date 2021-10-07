@@ -39,6 +39,10 @@ To install these packages in Ubuntu, type the following command:
 ```
 sudo apt-get install xorg-dev g++ cmake
 ```
+In Fedora, the `xorg-dev` package is not available. Instead, install the packages:
+```
+libX11-devel libXinerama-devel.x86_6 libXcursor-devel.x86_64 libXi-devel.x86_64 libXrandr-devel.x86_64 mesa-libGL-devel.x86_64
+```
 
 ### MacOS
 
@@ -51,6 +55,12 @@ To install them, assuming you have the [brew](https://brew.sh) package manager, 
 xcode-select --install
 brew install cmake
 ```
+
+### Virtual Machines
+
+If you use a VM with a graphical interface, refer to the section for the operating system installed on it.
+
+**Warning:** the graphical simulations are based on OpenGL, and common Virtual Machine software (e.g., VirtualBox) has faulty support for OpenGL. If you rely on a virtual machine for graphical simulations, it might work provided that you select hardware virtualization (as opposed to software virtualization). However, it is recommended to use the native OS whenever possible.
 
 
 ## Execution
