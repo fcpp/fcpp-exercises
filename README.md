@@ -101,7 +101,7 @@ This project consists of four files (besides git configuration files):
     - Then, the **aggregate program** section specifies the behaviour to be executed on the distributed system, through a _field calculus_-like dialect of C++.
     - Finally, the **system setup** section specifies the execution settings under which the program is to be run, encoding them into empty types that are passed as options to the main FCPP classes.
 
-More details on these sections are given below.
+  More details on these sections are given below.
 - `CMakeLists.txt`. This contains the CMake configuration for the project. The first four commands (line 1-8) ensure that the FCPP library is properly loaded. After defining the project, the execution targets can be declared through:
   ```
   fcpp_target(executable_path has_gui)
