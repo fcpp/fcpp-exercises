@@ -100,6 +100,7 @@ This project consists of four files (besides git configuration files):
     - First, the **introduction** section imports the FCPP library and declares a series of _tags_ (empty types) and _constexpr_ constants to be later used both in the _aggregate program_ and _system setup_.
     - Then, the **aggregate program** section specifies the behaviour to be executed on the distributed system, through a _field calculus_-like dialect of C++.
     - Finally, the **system setup** section specifies the execution settings under which the program is to be run, encoding them into empty types that are passed as options to the main FCPP classes.
+
 More details on these sections are given below.
 - `CMakeLists.txt`. This contains the CMake configuration for the project. The first four commands (line 1-8) ensure that the FCPP library is properly loaded. After defining the project, the execution targets can be declared through:
   ```
@@ -142,7 +143,7 @@ Presentation of the various coordination headers to ease function lookup.
 
 
 ### System Setup
-q
+
 Work in progress.
 
 #### Components and compositions
