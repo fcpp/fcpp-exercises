@@ -5,6 +5,8 @@
  * @brief Quick-start aggregate computing exercises.
  */
 
+// [INTRODUCTION]
+//! Importing the FCPP library.
 #include "lib/fcpp.hpp"
 
 /**
@@ -25,6 +27,11 @@ namespace tags {
     struct node_shape {};
     // ... add more as needed, here and in the tuple_store<...> option below
 }
+
+//! @brief The maximum communication range between nodes.
+constexpr size_t communication_range = 100;
+
+// [AGGREGATE PROGRAM]
 
 /**
  * EXERCISES:
@@ -92,7 +99,7 @@ MAIN() {
     });
 
     // usage of node physics
-    node.velocity() = -node.position()/100;
+    node.velocity() = -node.position()/communication_range;
 
     // usage of node storage
     node.storage(node_size{}) = 10;
@@ -104,6 +111,7 @@ FUN_EXPORT main_t = common::export_list<double, int>;
 
 } // namespace coordination
 
+// [SYSTEM SETUP]
 
 //! @brief Namespace for component options.
 namespace option {

@@ -69,7 +69,7 @@ In order to execute the exercises file, type the following command in a terminal
 ```
 > ./make.sh gui run -O exercises
 ```
-Running the above command, you should see output about building the executables then the graphical simulation should pop up.
+Running the above command, you should see output about building the executables then the graphical simulation should pop up while the console will show the most recent `stdout` and `stderr` outputs of the application, together with resource usage statistics (both on RAM and CPU).  During the execution, log files will be generated in the `output/` repository sub-folder. If a batch of multiple simulations is launched (which is not the case for the `exercises` target), individual simulation results will be logged in the `output/raw/` subdirectory, with the overall resume in the `output/` directory).
 
 ### Graphical User Interface
 
@@ -95,11 +95,80 @@ Hovering on a node will also display its UID in the top-left corner.
 ## Project Inspection
 
 This project consists of four files (besides git configuration files):
-- `run/exercises.cpp`. This contains the actual C++ code (using the FCPP library) that will be run. In-line documentation is provided to show the purpose of its various parts.
-- `CMakeLists.txt`. This contains the CMake configuration for the project. The first four lines ensure that the FCPP library is properly loaded. After defining the project, the execution target can be declared through:
+
+- `run/exercises.cpp`. This contains the actual C++ code (using the FCPP library) that will be run. In-line documentation is provided to show the purpose of its various parts. This file consists of three sections with different purposes:
+    - First, the **introduction** section imports the FCPP library and declares a series of _tags_ (empty types) and _constexpr_ constants to be later used both in the _aggregate program_ and _system setup_.
+    - Then, the **aggregate program** section specifies the behaviour to be executed on the distributed system, through a _field calculus_-like dialect of C++.
+    - Finally, the **system setup** section specifies the execution settings under which the program is to be run, encoding them into empty types that are passed as options to the main FCPP classes.
+More details on these sections are given below.
+- `CMakeLists.txt`. This contains the CMake configuration for the project. The first four commands (line 1-8) ensure that the FCPP library is properly loaded. After defining the project, the execution targets can be declared through:
   ```
-  fcpp_target(executable_name source_path has_gui)
+  fcpp_target(executable_path has_gui)
   ```
-  where `has_gui` can be either `ON` or `OFF`.
-- `make.sh`. This script provides a friendly interface to the build and execution tools. Launching `./make.sh` without arguments shows the relevant help.
+  where `has_gui` can be either `ON` or `OFF`. The file name (without directory and extensions) of every declared target needs to be unique. If needed, automated tests can similarly be defined through:
+  ```
+  fcpp_test(executable_path)
+  ```
+- `make.sh`. This script provides a friendly interface to the build and execution tools. Launching `./make.sh` without arguments shows the relevant help. The most common usages are:
+    - `./make.sh doc`: build the doxygen documentation (needs a `Doxyfile` such as the one available in `fcpp/src/Doxyfile`)
+    - `./make.sh gui run -O all`: perform an optimised build and run of every target (with GUI enabled)
+    - `./make.sh test all`: perform all automated tests
 - `README.md`, which is this file.
+
+
+### Aggregate Program
+
+Work in progress.
+
+#### Aggregate function definition and exports
+
+Main function, auxiliary functions, generic functions, exports.
+
+#### Function call patterns
+
+Pure calls, aggregate calls, built-in calls, common built-ins.
+
+#### Basic types
+
+Numeric aliases; colors, shapes and vecs; tuples and operators; fields and operators.
+
+#### Coordination operators
+
+Old, nbr, oldnbr in their variants.
+
+#### Coordination library
+
+Presentation of the various coordination headers to ease function lookup.
+
+
+### System Setup
+q
+Work in progress.
+
+#### Components and compositions
+
+Component-based architecture; components' list; pre-defined compositions' list.
+
+#### Declaration options and initialisation values
+
+The option macro; tagged tuples and the init_v argument.
+
+#### Single runs and batch executions
+
+Single run execution pattern; batch::run and batch::make_tagged_tuple_sequence.
+
+#### Distributions and sequences
+
+Usage for schedules and spawn inits; general interface and assumptions; generator versions: generic composition, numeric `_n`, input `_i`; summary of available classes.
+
+#### Aggregators and logging
+
+Usage of aggregators for logging; general interface; aggregator composition; summary of available classes.
+
+#### Connection predicates and metrics
+
+Usage of connection predicates and metrics for simulation; general interface; summary of available classes.
+
+#### Plot generation library
+
+Plotter type and usage; basic plots; split and join; custom plots.
