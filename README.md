@@ -135,7 +135,45 @@ Numeric aliases; colors, shapes and vecs; tuples and operators; fields and opera
 
 #### Coordination operators
 
-Old, nbr, oldnbr in their variants.
+Operations that peculiar to the FC computation model, allowing to:
+
+- share information with neighbours (`nbr`)
+- recall values computed in the previous round (`old`)
+
+See also the [FCPP paper](http://giorgio.audrito.info/static/fcpp.pdf) for further information. 
+
+
+The `nbr` comes in four flavors:
+
+- `to_field<A> nbr(ARGS, A const& f)`: beside the `ARGS` needed by all aggregate functions (see above), receives
+    - `f`: a value of type `A`. A neighbouring field of `A` is populated as follows: the current device is associated with the value of `f` at the previous round of computation (if any, otherwise the value of `f` at the current round is used); the values for the other neighbouring devices are the most recent ones received by the current node
+- `to_field<A> nbr(ARGS, A const& f0, A const& f)` receives
+    - `f0`: a value of type `A` used as a default value for the value of `f` at the previous round (see next item)
+    - `f`: a value of type `A`. A neighbouring field of `A` is populated as follows: the current device is associated with the value of `f` at the previous round of computation (if any, otherwise the value of `f0` is used); the values for the other neighbouring devices are the most recent ones received by the current node
+- `A nbr(ARGS, A const& f0, G&& op)` receives
+    - `f0`: a value of type `A` used as a default value for any device in the field of `A` that is produced
+    - `op`: a lambda function of type `field<A>` → `A`; a neighbouring field of `A` is populated as in the previous form of `nbr`, then a value of type `A` is obtained by applying `op` to such field
+- `B nbr(ARGS, A const& f0, G&& op)` receives
+    - `f0`: a value of type `A` used as a default value for any device in the field of `A` that is produced
+    - `op`: a lambda function of type `field<A>` → `tuple<B,A>`; a neighbouring field of `A` is populated as in the previous form of `nbr`, then a tuple with a `B` value and an an `A` value is obtained by applying `op` to such field
+
+Note that the first two forms return a `to_field<A>` value, that resolves to `field<A>` only if `A` is not itself a field (as explained in *Basic types* above). The 3rd and 4th forms, instead, return a single `A` (resp. `B`) value. All the returned values can then be used in further computations during the current round.
+
+At the end of the round, all forms cause the FCPP library to send to the neighbouring devices the computed `A` value associated with the current device, that for the 1st and 2nd forms is contained in the field returned by `nbr`, while for the 3rd and 4th forms is the one computed by `op` (and also returned by the 3rd form).
+
+It should be noted that the 4th form of `nbr` subsumes all the other ones. Indeed:
+
+- the 3rd form can be obtained from the 4th by just making `op` return a pair of two identical values of type `A`
+- the 2nd form can be obtained from the 4th with the following call:
+  ```
+  nbr(ARGS, f0, [](to_field<A> fn){
+     return std::make_pair(fn, f);
+  })
+  ```
+- the 1st form can be obtained from the 2nd form with the simple call `nbr(ARGS, f, f)`
+
+ 
+
 
 #### Coordination library
 
