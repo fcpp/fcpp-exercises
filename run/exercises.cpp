@@ -14,6 +14,12 @@
  */
 namespace fcpp {
 
+//! @brief Dummy ordering between positions (allows positions to be used as secondary keys in ordered tuples).
+template <size_t n>
+bool operator<(vec<n> const&, vec<n> const&) {
+    return false;
+}
+
 //! @brief Namespace containing the libraries of coordination routines.
 namespace coordination {
 
