@@ -119,11 +119,46 @@ This project consists of four files (besides git configuration files):
 
 ## Aggregate Program
 
-Work in progress.
+The Aggregate Program consists of a `MAIN` aggregate function, whose body can issue calls to other aggregate functions, as well as pure C++ functions.
+
+The `MAIN` of the Aggregate Program (not to be confused with the *main* function of the C++ application built on top of FCPP) is defined as follows:
+```
+MAIN() {
+   ...
+}
+```
+
+It important that `MAIN` defines a so-called *export list* by adding a suitable statement after the end of the function. For example, adding the following statement:
+```
+FUN_EXPORT main_t = common::export_list<double, int>;
+```   
+right after the end of `MAIN` populates a variable `main_t` with a list of all the types of the values exchanged through operators `nbr`, `old`, and `oldnbr`. In this example we are assuming that only values of type `int` and `double` are exchanged when executing `MAIN`.
 
 ### Aggregate function definition and exports
 
-Main function, auxiliary functions, generic functions, exports.
+An *aggregate function* (i.e., a functions that contains calls to *aggregate operators* or other aggregate functions)must be defined in a special way, compared to a pure C++ function. 
+
+The aggregate functions definition schema is the following:
+```
+DEF() rettype fname(ARGS, arguments) { CODE
+   ...
+}
+```
+where:
+- `rettype` is the return type
+- `arguments` is a list of arguments accepted by the function
+- `DEF()`, `ARGS`, and `CODE` are C++ macros that slightly *instrument* the function to support Aggregate Programming
+
+Also aggregate functions that are not `MAIN` should define an export list. Typically one such function defines its export list by adding a statement as the following:
+```
+FUN_EXPORT aggfun_t = common::export_list<...>;
+```   
+Then, the list `aggfun_t` is added to the list of `MAIN` by modifiying its definition:  
+```
+FUN_EXPORT main_t = common::export_list<double, int, aggfun_t>;
+```   
+
+TODO: auxiliary functions, generic functions.
 
 ### Function call patterns
 
