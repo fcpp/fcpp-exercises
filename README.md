@@ -119,46 +119,59 @@ This project consists of four files (besides git configuration files):
 
 ## Aggregate Program
 
-The Aggregate Program consists of a `MAIN` aggregate function, whose body can issue calls to other aggregate functions, as well as pure C++ functions.
+The _Aggregate Program_ section consists of a sequence of definitions: pure C++ functions, auxiliary aggregate functions and a main aggregate function, together with the definition of their _exports_.
 
-The `MAIN` of the Aggregate Program (not to be confused with the *main* function of the C++ application built on top of FCPP) is defined as follows:
+### The main aggregate function
+
+Every aggregate program should have a single main aggregate function, which is the starting point of the aggregate program executed in every round by every node in the network. Its body can then issue calls to other aggregate functions, as well as pure C++ functions (see _Function call patterns_ below). The main aggregate function (not to be confused with the *main* function of the C++ application built on top of FCPP) is defined as follows:
 ```
 MAIN() {
    ...
 }
 ```
-
-It important that `MAIN` defines a so-called *export list* by adding a suitable statement after the end of the function. For example, adding the following statement:
-```
-FUN_EXPORT main_t = common::export_list<double, int>;
-```   
-right after the end of `MAIN` populates a variable `main_t` with a list of all the types of the values exchanged through operators `nbr`, `old`, and `oldnbr`. In this example we are assuming that only values of type `int` and `double` are exchanged when executing `MAIN`.
+where `MAIN` is a [macro](http://fcpp-doc.surge.sh/beautify_8hpp.html) defining a callable class `main` with the given body. Besides its special role as program entry point, this function works as any other aggregate function, including the need to define an _export list_ (see _Aggregate function definition and exports_ below). 
 
 ### Aggregate function definition and exports
 
-An *aggregate function* (i.e., a functions that contains calls to *aggregate operators* or other aggregate functions)must be defined in a special way, compared to a pure C++ function. 
-
-The aggregate functions definition schema is the following:
+An *aggregate function* (i.e., a function that contains calls to *aggregate operators* or other aggregate functions) must be defined in a special way, compared to a pure C++ function. For non-templated functions, the definition schema is the following:
 ```
-DEF() rettype fname(ARGS, arguments) { CODE
+FUN return_type name(ARGS, arguments) { CODE
    ...
 }
+FUN_EXPORT name_t = common::export_list<...>;
 ```
 where:
-- `rettype` is the return type
-- `arguments` is a list of arguments accepted by the function
-- `DEF()`, `ARGS`, and `CODE` are C++ macros that slightly *instrument* the function to support Aggregate Programming
+- `return_type` is the return type of the function;
+- `name` is the name of the function;
+- `arguments` is the list of arguments accepted by the function;
+- `FUN`,  `ARGS`, and `CODE` are C++ macros that *instrument* the function to support coordination operators (injecting a reference to the `node` object, and keeping track of the stack frame of function calls to allow automatic alignment of messages);
+- conventionally, the function name with an `_t` suffix (using `main_t` for the `MAIN` function) is used to declare the _export list_.
 
-Also aggregate functions that are not `MAIN` should define an export list. Typically one such function defines its export list by adding a statement as the following:
+The export list is the sequence of types that are used in the coordination operators appearing in the body of the function. This information is crucial, in order to properly set up the data structures collecting the messages that need to be exchanged. In that list, all the types of the `old`, `nbr` or `oldnbr` (see _Coordination operators_ below) appearing in the body should be included. In addition, for every function call in the body to an aggregate function `aggrfun` an item `aggrfun_t` should also be included, to recursively include the types needed within the body of that function. For instance:
 ```
-FUN_EXPORT aggfun_t = common::export_list<...>;
-```   
-Then, the list `aggfun_t` is added to the list of `MAIN` by modifiying its definition:  
+FUN_EXPORT main_t = common::export_list<double, field<int>, abf_hops_t>;
 ```
-FUN_EXPORT main_t = common::export_list<double, int, aggfun_t>;
-```   
+declares that the `MAIN` function is directly using coordination operators exchanging information of type either `double` or `field<int>`, in addition to performing a call to the aggregate function `abf_hops`.
 
-TODO: auxiliary functions, generic functions.
+Aggregate functions, like pure C++ function, can also be templated to accept different types for their arguments. These are called _generic aggregate functions_, and have the following definition schema:
+```
+GEN(...) return_type name(ARGS, arguments) { CODE
+...
+}
+GEN_EXPORT name_t = common::export_list<...>;
+```
+As you can see, the scheme is almost identical, except that:
+- `GEN(...)` is used instead of `FUN`, to declare the parameter types;
+- similarly, `GEN_EXPORT` is used instead of `GEN` with the list of relevant parameter types.
+
+In particular, generic types are needed to reliably implement higher-order functions, accepting function arguments. Towards this aim, a further `BOUND( F, R(T...) )` clause can be included to bound the generic type `F` to be callable as a function with given signature `R(T...)`. For instance:
+```
+GEN(T, F, BOUND( F, T(T,T) )) gossip(ARGS, T value, F&& accumulate) { CODE
+...
+}
+GEN_EXPORT(T) gossip_t = common::export_list<T>;
+```
+is the definition of the generic aggregate function [`coordination::gossip`](http://fcpp-doc.surge.sh/collection_8hpp.html). This function accepts a value of a generic type `T` and an accumulating function of a generic type `F`, which needs to be callable with two `T` arguments and return a `T` result.
 
 ### Function call patterns
 
