@@ -138,7 +138,7 @@ An *aggregate function* (i.e., a function that contains calls to *aggregate oper
 FUN return_type name(ARGS, arguments) { CODE
    ...
 }
-FUN_EXPORT name_t = common::export_list<...>;
+FUN_EXPORT name_t = export_list<...>;
 ```
 where:
 - `return_type` is the return type of the function;
@@ -149,7 +149,7 @@ where:
 
 The export list is the sequence of types that are used in the coordination operators appearing in the body of the function. This information is crucial, in order to properly set up the data structures collecting the messages that need to be exchanged. In that list, all the types of the `old`, `nbr` or `oldnbr` (see _Coordination operators_ below) appearing in the body should be included. In addition, for every function call in the body to an aggregate function `aggrfun` an item `aggrfun_t` should also be included, to recursively include the types needed within the body of that function. For instance:
 ```
-FUN_EXPORT main_t = common::export_list<double, field<int>, abf_hops_t>;
+FUN_EXPORT main_t = export_list<double, field<int>, abf_hops_t>;
 ```
 declares that the `MAIN` function is directly using coordination operators exchanging information of type either `double` or `field<int>`, in addition to performing a call to the aggregate function `abf_hops`.
 
@@ -158,7 +158,7 @@ Aggregate functions, like pure C++ function, can also be templated to accept dif
 GEN(...) return_type name(ARGS, arguments) { CODE
 ...
 }
-GEN_EXPORT name_t = common::export_list<...>;
+GEN_EXPORT name_t = export_list<...>;
 ```
 As you can see, the scheme is almost identical, except that:
 - `GEN(...)` is used instead of `FUN`, to declare the parameter types;
@@ -169,13 +169,44 @@ In particular, generic types are needed to reliably implement higher-order funct
 GEN(T, F, BOUND( F, T(T,T) )) gossip(ARGS, T value, F&& accumulate) { CODE
 ...
 }
-GEN_EXPORT(T) gossip_t = common::export_list<T>;
+GEN_EXPORT(T) gossip_t = export_list<T>;
 ```
 is the definition of the generic aggregate function [`coordination::gossip`](http://fcpp-doc.surge.sh/collection_8hpp.html). This function accepts a value of a generic type `T` and an accumulating function of a generic type `F`, which needs to be callable with two `T` arguments and return a `T` result.
 
 ### Function call patterns
 
-Pure calls, aggregate calls, built-in calls, common built-ins.
+In FCPP, there are different call patterns depending on what is being called. Aggregate functions `f` are called by providing an additional `CALL` argument, as `f(CALL, args...)`. This additional argument is a macro, propagating the reference to the `node` object and providing a counter needed for stack frame update, which is designed to pass the `ARGS` arguments. Aggregate functions include:
+- Every user-defined aggregate function, defined through `FUN` and `GEN`;
+- Every function in the [`coordination`](http://fcpp-doc.surge.sh/namespacefcpp_1_1coordination.html) namespace;
+- Coordination operators `old`, `nbr` and `oldnbr` (see _Coordination operators_ below);
+- Aggregate processes with `spawn` (see _Aggregate processes_ below);
+- Field modifiers `align`, `align_inplace`, `self`, `mod_self`, `other`, `mod_other` (see _Basic types_ below);
+- Field folding functions `fold_hood` and `count_hood` (see _Basic types_ below).
+
+On the other hand, pure C++ functions, class methods, and function objects are generally called `f(args...)` as in basic C++. For instance, this includes:
+- STL functions such as [`std::sort`](https://en.cppreference.com/w/cpp/algorithm/sort) and class methods such as [`v.front()`](https://www.cplusplus.com/reference/vector/vector/front/);
+- Capturing lambda expressions, even with an aggregate body:
+```
+[&](field<int> x){ return min_hood(CALL, x); }
+```
+- Node sensors, which are indeed class methods of the `node` object, such as `node.nbr_uid()`;
+- Field mapping functions, such as `map_hood` and `mod_hood`.
+
+The last point may be surprising, given that all other field operations are instead aggregate and need the `CALL` keyword: however, this is due to the fact that basic operators such as `+` or `*` are applied point-wise on fields by relying on functions `map_hood` and `mod_hood`, and it is impossible to provide the `CALL` keyword to them.
+
+The set of available node sensors may vary depending on the combination of components chosen (see _Components and compositions_ below). The most common are:
+- Logical connection handlers such as `node.connected` ([`graph_connector`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1graph__connector_1_1component_1_1node.html) component);
+- Neighbour listing through `node.nbr_uid` ([`calculus`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1calculus_1_1component_1_1node.html) component);
+- Random generation functions such as `node.next_int` ([`randomizer`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1randomizer_1_1component_1_1node.html) component);
+- Storage access through `node.storage` ([`storage`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1storage_1_1component_1_1node.html) component);
+- Timing functions such as `node.previous_time` ([`timer`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1timer_1_1component_1_1node.html) component);
+- Physical connection handlers such as `node.nbr_dist` ([`hardware_connector`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1hardware__connector_1_1component_1_1node.html) and [`simulated_connector`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1simulated__connector_1_1component_1_1node.html) components);
+- Motion handlers such as `node.velocity` ([`simulated_positioner`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1simulated__positioner_1_1component_1_1node.html) component).
+
+In simulated systems, components also provide methods accessing network-wide knowledge through the `node.net` object, such as:
+- Other node accessors such as `node.net.node_at` ([`identifier`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1identifier_1_1component_1_1net.html) component);
+- Network timers such as `node.net.terminate` ([`timer`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1timer_1_1component_1_1net.html) component);
+- Functions modelling obstacles such as `node.closest_space` ([`simulated_map`](http://fcpp-doc.surge.sh/classfcpp_1_1component_1_1simulated__map_1_1component_1_1net.html) component).
 
 ### Basic types
 
@@ -224,6 +255,10 @@ The `nbr` operator comes in four flavors, with increasing level of expressivenes
     - *returns:* TODO
 
 Note that the first two forms return a `to_field<A>` value, as explained in *Basic types* above, while the 3rd and 4th forms, instead, return a plain `A` (resp. `B`) value. All the returned values can then be used in further computations during the current round. At the end of the round, all forms cause the FCPP library to send to the neighbouring devices the computed `A` value associated with the current device, that for the 1st and 2nd forms is the last argument itself, while for the 3rd and 4th forms is obtained from the result of `op`.
+
+### Aggregate processes
+
+The spawn function.
 
 ### Coordination library
 
