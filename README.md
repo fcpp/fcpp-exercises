@@ -190,7 +190,7 @@ On the other hand, pure C++ functions, class methods, and function objects are g
 [&](field<int> x){ return min_hood(CALL, x); }
 ```
 - Node sensors, which are indeed class methods of the `node` object, such as `node.nbr_uid()`;
-- Field mapping functions, such as `map_hood` and `mod_hood`.
+- Field mapping functions: generic `map_hood` and `mod_hood`, basic operators on fields (such as `+`, `&&`, etc.), mathematical functions (`mux`, `max`, `min`, `get`, `round`, `floor`, `ceil`, `log`, `exp`, `sqrt`, `pow`, `isinf`, `isnan`, `isfinite`, `isnormal`).
 
 The last point may be surprising, given that all other field operations are instead aggregate and need the `CALL` keyword: however, this is due to the fact that basic operators such as `+` or `*` are applied point-wise on fields by relying on functions `map_hood` and `mod_hood`, and it is impossible to provide the `CALL` keyword to them.
 
