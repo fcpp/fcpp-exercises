@@ -113,7 +113,7 @@ MAIN() {
     node.storage(node_shape{}) = shape::sphere;
 }
 //! @brief Export types used by the main function (update it when expanding the program).
-FUN_EXPORT main_t = common::export_list<double, int>;
+FUN_EXPORT main_t = export_list<double, int>;
 
 } // namespace coordination
 
