@@ -162,7 +162,7 @@ GEN_EXPORT name_t = export_list<...>;
 ```
 As you can see, the scheme is almost identical, except that:
 - `GEN(...)` is used instead of `FUN`, to declare the parameter types;
-- similarly, `GEN_EXPORT` is used instead of `GEN` with the list of relevant parameter types.
+- similarly, `GEN_EXPORT` is used instead of `FUN_EXPORT` with the list of relevant parameter types.
 
 In particular, generic types are needed to reliably implement higher-order functions, accepting function arguments. Towards this aim, a further `BOUND( F, R(T...) )` clause can be included to bound the generic type `F` to be callable as a function with given signature `R(T...)`. For instance:
 ```
@@ -210,7 +210,33 @@ In simulated systems, components also provide methods accessing network-wide kno
 
 ### Basic types
 
-Numeric aliases; colors, shapes and vecs; tuples and operators; fields and operators ([API reference](http://fcpp-doc.surge.sh/dir_a649fd95b532dff35a9ca005b15ee438.html)). This includes `to_field` and `to_local` and the concepts of default/exceptions of a field (and how they can be applied to locals as well).
+FCPP includes few numeric aliases for specific purposes:
+- `hops_t` to store hop counts (integer);
+- `device_t` to store device identifiers (integer);
+- `times_t` to store timestamps (floating point);
+- `real_t` to store real numbers (floating point).
+The exact sizes of these types depends on the specific configuration under which the library is compiled (for instance, if it is compiled for simulation, or execution on embedded systems, etc.).
+
+Other general purpose types are provided to handle graphics and physics (see the [API reference](http://fcpp-doc.surge.sh/dir_a649fd95b532dff35a9ca005b15ee438.html)):
+- `color` to store and manipulate color information;
+- `shape` to represent drawable shapes;
+- `tuple` as a boosted version of `std::tuple`;
+- `vec` to store and manipulate physical vectors.
+Colors can be generated from their RGBA representation as `color(r, g, b, a)`, from an HSVA representation as `color::hsva(h, s, v, a)` and from an HTML color name as `color(HTML_COLOR_NAME)`. Currently available shapes are tetrahedron, cube, octahedron, icosahedron, sphere and star. Tuples work as `std::tuple`, except that they define point-wise lifting of any operator available on their basic types (for instance, `make_tuple(1,2) + make_tuple(3,4) == make_tuple(4,6)`) and are designed to cohoperate with fields (see below). Operations on vectors include vectorial sum, scalar multiplication, norm and norm-based comparisons (cross product is not defined).   
+
+Finally, the generic `field<T>` type is provided to implement the concept of _neighboring values_: views of values to exchange with neighbours (either from them or for them), implemented as defaulted maps from neighbor UIDs (of type `device_t`) to values (of type `T`). The main operators to access and modify fields are:
+- Every operator supported for the base type `T` is lifted to `field<T>` by pointwise application;
+- Other field mapping functions, including generic `map_hood` and `mod_hood`, and mathematical functions (`mux`, `max`, `min`, `get`, `round`, `floor`, `ceil`, `log`, `exp`, `sqrt`, `pow`, `isinf`, `isnan`, `isfinite`, `isnormal`);
+- Field modifiers: `align`, `align_inplace` (discarding elements from the map), `self`, `mod_self` (accessing the value of the map for the current device), `other`, `mod_other` (accessing the default value of the map);
+- Field folding functions: generic `fold_hood` (reducing values of neighbours with a given function) and its specialisations `*_hood` (see [utils.hpp](http://fcpp-doc.surge.sh/utils_8hpp.html) in the API reference).
+
+Every field operator is designed to be applicable to values of basic type `T` as well, and behaves by interpreting them as defaulted empty maps (of type `field<T>` with only the default).
+
+The field class is also designed to interplay with `tuple`, so that a tuple of field can be treated as a field of tuples. For instance, a `fold_hood` can be used to select the lexicographic minimum on an object `make_tuple(node.nbr_dist(), node.nbr_uid(), node.uid)` which is a tuple of two fields and a number. Towards this aim, a template `to_local<T>` is provided which strips fields (which may be nested within tuples) from `T`, so that for instance:
+```
+to_local<tuple<field<real_t>, field<device_t>, device_t> == tuple<real_t, device_t, device_t>
+```
+A similar `to_field<T>` is also provided as a shorthand to `field<to_local<T>>`.
 
 ### Coordination operators
 
