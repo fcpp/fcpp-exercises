@@ -7,37 +7,51 @@ Quick-start aggregate computing exercises. The exercises themselves are describe
 
 - FCPP main website: [https://fcpp.github.io](https://fcpp.github.io).
 - FCPP documentation: [http://fcpp-doc.surge.sh](http://fcpp-doc.surge.sh).
+- FCPP presentation paper: [http://giorgio.audrito.info/static/fcpp.pdf](http://giorgio.audrito.info/static/fcpp.pdf).
 - FCPP sources: [https://github.com/fcpp/fcpp](https://github.com/fcpp/fcpp).
 
 
 ## Setup
 
-The next sections contain the FCPP setup instructions for the various supported OSs. Jump to the section dedicated to your system of choice and ignore the others.
+The next sections contain the setup instructions for the various supported OSs. Jump to the section dedicated to your system of choice and ignore the others.
 
 ### Windows
 
 Pre-requisites:
 - [Git Bash](https://gitforwindows.org) (for issuing unix-style commands)
-- [MinGW-w64](http://mingw-w64.org) ([builds 8.1.0](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download))
-- [CMake 3.9](https://cmake.org) (or higher)
+- [MinGW-w64](http://mingw-w64.org) (GCC 11.2.0 or higher)
+- [CMake 3.18](https://cmake.org) (or higher)
+- [Asymptote](http://asymptote.sourceforge.io) (for building the plots)
 
-During CMake installation, make sure you select to add `cmake` to the `PATH` (at least for the current user).
-During MinGW installation, make sure you select "posix" threads (should be the default) and not "win32" threads. After installing MinGW, you need to add its path to the environment variable `PATH`. The default path should be:
+It is recommended to install MinGW-w64 and CMake through [MSYS2](https://www.msys2.org/) in order to get the latest version of MinGW-w64's GCC and CMake. To do so:
+- Download and install MSYS2.
+- Run "MSYS2 MSYS" from the start menu; a terminal will appear.
+- Run `pacman -Syu`; a restart of all MSYS2 processes is required at the end of the update.
+- Run "MSYS2 MSYS" again, and run `pacman -Su`.
+- Run `pacman -S --needed base-devel mingw-w64-x86_64-toolchain` to install the MinGW-w64 toolchain.
+- Run `pacman -S mingw-w64-x86_64-cmake` to install CMake.
+- Run `pacman -S mingw-w64-x86_64-make` to install MinGW-w64's make tool (used by CMake).
+
+After the installation of these packages, make sure to add their path to the `PATH` environment variable (e.g., by editing the `.bashrc` file in your home). They should reside in MSYS2's installation folder as such:
 ```
-C:\Program Files (x86)\mingw-w64\i686-8.1.0-posix-dwarf-rt_v6-rev0\mingw32\bin
+C:\msys64\mingw64\bin
 ```
-but the actual path may vary depending on your installation.
+but the actual path may vary depending on your installation (GCC's and CMake's binaries are already in `PATH` if you execute the "MSYS2 MinGW x64" shortcut from the start menu). Then, you should be able to build the whole library with CMake through:
+```
+./make.sh gui windows
+```
 
 ### Linux
 
 Pre-requisites:
 - Xorg-dev package (X11)
 - G++ 9 (or higher)
-- CMake 3.9 (or higher)
+- CMake 3.18 (or higher)
+- Asymptote (for building the plots)
 
 To install these packages in Ubuntu, type the following command:
 ```
-sudo apt-get install xorg-dev g++ cmake
+sudo apt-get install xorg-dev g++ cmake asymptote
 ```
 In Fedora, the `xorg-dev` package is not available. Instead, install the packages:
 ```
@@ -48,12 +62,13 @@ libX11-devel libXinerama-devel.x86_6 libXcursor-devel.x86_64 libXi-devel.x86_64 
 
 Pre-requisites:
 - Xcode Command Line Tools
-- CMake 3.9 (or higher)
+- CMake 3.18 (or higher)
+- Asymptote (for building the plots)
 
 To install them, assuming you have the [brew](https://brew.sh) package manager, type the following commands:
 ```
 xcode-select --install
-brew install cmake
+brew install cmake asymptote
 ```
 
 ### Virtual Machines
@@ -69,6 +84,7 @@ In order to execute the exercises file, type the following command in a terminal
 ```
 > ./make.sh gui run -O exercises
 ```
+On newer Mac M1 computers, the `-O` argument may induce compilation errors: in that case, use the `-O3` argument instead.
 Running the above command, you should see output about building the executables then the graphical simulation should pop up while the console will show the most recent `stdout` and `stderr` outputs of the application, together with resource usage statistics (both on RAM and CPU).  During the execution, log files will be generated in the `output/` repository sub-folder. If a batch of multiple simulations is launched (which is not the case for the `exercises` target), individual simulation results will be logged in the `output/raw/` subdirectory, with the overall resume in the `output/` directory).
 
 ### Graphical User Interface
