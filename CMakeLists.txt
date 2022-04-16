@@ -1,5 +1,5 @@
 # minimum required version of CMake
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 # avoid building internal tests of the FCPP library
 option(FCPP_INTERNAL_TESTS "Build internal tests for FCPP." OFF)
 # load the FCPP sub-module

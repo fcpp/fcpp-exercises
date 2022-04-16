@@ -36,10 +36,7 @@ After the installation of these packages, make sure to add their path to the `PA
 ```
 C:\msys64\mingw64\bin
 ```
-but the actual path may vary depending on your installation (GCC's and CMake's binaries are already in `PATH` if you execute the "MSYS2 MinGW x64" shortcut from the start menu). Then, you should be able to build the whole library with CMake through:
-```
-./make.sh gui windows
-```
+but the actual path may vary depending on your installation (GCC's and CMake's binaries are already in `PATH` if you execute the "MSYS2 MinGW x64" shortcut from the start menu).
 
 ### Linux
 
@@ -85,7 +82,7 @@ In order to execute the exercises file, type the following command in a terminal
 > ./make.sh gui run -O exercises
 ```
 On newer Mac M1 computers, the `-O` argument may induce compilation errors: in that case, use the `-O3` argument instead.
-Running the above command, you should see output about building the executables then the graphical simulation should pop up while the console will show the most recent `stdout` and `stderr` outputs of the application, together with resource usage statistics (both on RAM and CPU).  During the execution, log files will be generated in the `output/` repository sub-folder. If a batch of multiple simulations is launched (which is not the case for the `exercises` target), individual simulation results will be logged in the `output/raw/` subdirectory, with the overall resume in the `output/` directory).
+Running the above command, you should see output about building the executables then the graphical simulation should pop up while the console will show the most recent `stdout` and `stderr` outputs of the application, together with resource usage statistics (both on RAM and CPU).  During the execution, log files will be generated in the `output/` repository sub-folder. If a batch of multiple simulations is launched (which is not the case for the `exercises` target), individual simulation results will be logged in the `output/raw/` subdirectory, with the overall resume in the `output/` directory.
 
 ### Graphical User Interface
 
