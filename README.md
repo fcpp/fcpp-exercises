@@ -29,11 +29,7 @@ After updating packages, the terminal will close. Open it again, and then type:
 ```
 pacman -Sy --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-make git
 ```
-After the installation of these packages, search for "environment variables" in the start menu, and edit the `PATH` variable by adding the MSYS2's installation folder, which usually is:
-```
-C:\msys64\mingw64\bin
-```
-but the actual path may vary depending on your installation.
+The build system should now be available from the "MSYS2 MinGW x64" terminal.
 
 ### Linux
 
