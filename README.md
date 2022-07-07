@@ -246,49 +246,101 @@ A similar `to_field<T>` is also provided as a shorthand to `field<to_local<T>>`.
 
 ### Coordination operators
 
-FCPP contains three operations peculiar to the *Aggregate Programming* model, allowing to:
+FCPP supports the operations peculiar to the *Aggregate Programming* model, allowing to:
 
-- share information with neighbours (`nbr`)
 - recall values computed in the previous round (`old`)
+- share information with neighbours (`nbr`)
 - do both things simultanously (`oldnbr`)
+- split computation into independent sub-networks (`split`)
+- start and manage aggregate processes (`spawn`)
 
-See also the [FCPP presentation paper](http://giorgio.audrito.info/static/fcpp.pdf) and the [API reference](http://fcpp-doc.surge.sh/calculus_8hpp.html) for detailed information. 
+See also the [FCPP presentation paper](http://giorgio.audrito.info/static/fcpp.pdf) and the [API reference](http://fcpp-doc.surge.sh/calculus_8hpp.html) for detailed information. We omit the `oldnbr` and `spawn` construct from this tutorial presentation, the others are detailed as follows.
 
-The `nbr` operator comes in four flavors, with increasing level of expressiveness, differing from their argument number and type:
+#### Local history management
 
-- `to_field<A> nbr(ARGS, A const& f)`
-    - `f`: a value of type `A` to be sent to neighbours.
-    - *returns:* a neighbouring field, where the default value coincides with the default of `f`, and exceptions are the most recent values for the current device sent by neighbours through the `f` they passed on their round (including the previous round of the current devices, if there was one).
-    - *equivalent to:* `nbr(CALL, f, f)`
-- `to_field<A> nbr(ARGS, A const& f0, A const& f)`
-    - `f0`: a value of type `A` to be used as default for the returned value.
-    - `f`: a value of type `A` to be sent to neighbours.
-    - *returns:* a neighbouring field, where the default value coincides with the default of `f0`, and exceptions are the most recent values for the current device sent by neighbours through the `f` they passed on their round (including the previous round of the current devices, if there was one).
-    - *equivalent to:* 
-      ```
-      nbr(CALL, f0, [](to_field<A> fn){
-        return make_tuple(fn, f);
-      })
-      ```
-- `A nbr(ARGS, A const& f0, G&& op)`
-    - `f0`: a value of type `A` used as a default value for any device in the field of `A` that is produced
-    - `op`: a lambda function of type `to_field<A>` → `A`; a neighbouring field of `A` is populated as in the previous form of `nbr`, then a value of type `A` is obtained by applying `op` to such field
-    - *returns:* TODO
+The `old` operator comes in four flavors, with increasing level of expressiveness, differing from their argument number and type:
+
+- `A old(ARGS, A const& x)`
+    - `x`: a value of type `A` to be stored for the following round.
+    - *returns:* the value passed as `x` in the previous round (or the value passed as `x` in the current round, if no value was stored in the previous round).
+    - *equivalent to:* `old(CALL, x, x)`
+- `A old(ARGS, A const& x0, A const& x)`
+    - `x0`: a value of type `A` to be used as default when no stored value is available.
+    - `x`: a value of type `A` to be stored for the following round.
+    - *returns:* the value passed as `x` in the previous round (or the value passed as `x0` in the current round, if no value was stored in the previous round).
     - *equivalent to:*
       ```
-      nbr(CALL, f0, [](to_field<A> fn){
-        A fx = op(fn);
-        return make_tuple(fx, fx);
+      old(CALL, x0, [](A xo){
+        return make_tuple(xo, x);
       })
       ```
-- `B nbr(ARGS, A const& f0, G&& op)`
-    - `f0`: a value of type `A` used as a default value for any device in the field of `A` that is produced
-    - `op`: a lambda function of type `to_field<A>` → `tuple<B,A>`; a neighbouring field of `A` is populated as in the previous form of `nbr`, then a tuple with a `B` value and an an `A` value is obtained by applying `op` to such field
-    - *returns:* TODO
+- `A old(ARGS, A const& x0, G&& op)`
+    - `x0`: a value of type `A` to be used as default when no stored value is available.
+    - `op`: a lambda function of type `A` → `A`.
+    - *returns:* the value of type `A` returned by the application of `op` to the value returned by `op` in the previous round (or to the value passed as `x0` in the current round, if no value was stored in the previous round).
+    - *equivalent to:*
+      ```
+      old(CALL, x0, [](A xo){
+        A y = op(xo);
+        return make_tuple(y, y);
+      })
+      ```
+- `B old(ARGS, A const& x0, G&& op)`
+    - `x0`: a value of type `A` to be used as default when no stored value is available.
+    - `op`: a lambda function of type `A` → `tuple<B,A>`.
+    - *returns:* the value of type `B` in the first element of the tuple returned by the application of `op` to the second element of the tuple returned by `op` in the previous round (or to the value passed as `x0` in the current round, if no value was stored in the previous round).
 
-Note that the first two forms return a `to_field<A>` value, as explained in *Basic types* above, while the 3rd and 4th forms, instead, return a plain `A` (resp. `B`) value. All the returned values can then be used in further computations during the current round. At the end of the round, all forms cause the FCPP library to send to the neighbouring devices the computed `A` value associated with the current device, that for the 1st and 2nd forms is the last argument itself, while for the 3rd and 4th forms is obtained from the result of `op`.
+At the end of the round, all forms cause the FCPP library to store the computed `A` value, that for the 1st and 2nd forms is the last argument itself, while for the 3rd and 4th forms is obtained from the result of `op`. When using any of these forms, the corresponding type `A` should be included in the `export_list`.
 
-### Aggregate processes
+#### Neighbourhood interaction
+
+Similarly, the `nbr` operator comes in four flavors, with increasing level of expressiveness, differing from their argument number and type:
+
+- `to_field<A> nbr(ARGS, A const& x)`
+    - `x`: a value of type `A` to be sent to neighbours.
+    - *returns:* a neighbouring field, where the default value coincides with the default of `x`, and custom values are the most recent values for the current device sent by neighbours through the `x` they passed on their round (including the previous round of the current device, if there was one).
+    - *equivalent to:* `nbr(CALL, x, x)`
+- `to_field<A> nbr(ARGS, A const& x0, A const& x)`
+    - `x0`: a value of type `A` to be used as default for the returned value.
+    - `x`: a value of type `A` to be sent to neighbours.
+    - *returns:* a neighbouring field, where the default value coincides with the default of `x0`, and custom values are the most recent values for the current device sent by neighbours through the `x` they passed on their round (including the previous round of the current device, if there was one).
+    - *equivalent to:* 
+      ```
+      nbr(CALL, x0, [](to_field<A> xn){
+        return make_tuple(xn, x);
+      })
+      ```
+- `A nbr(ARGS, A const& x0, G&& op)`
+    - `x0`: a value of type `A` to be used as default for the returned value.
+    - `op`: a lambda function of type `to_field<A>` → `A`.
+    - *returns:* a the value of type `A` returned by the application of `op` to the neighbouring field with a default value coinciding with the default of `x0`, and custom values that are the most recent values for the current device sent by neighbours through the value returned by `op` on their round (including the previous round of the current device, if there was one).
+    - *equivalent to:*
+      ```
+      nbr(CALL, x0, [](to_field<A> xn){
+        A y = op(xn);
+        return make_tuple(y, y);
+      })
+      ```
+- `B nbr(ARGS, A const& x0, G&& op)`
+    - `x0`: a value of type `A` to be used as default for the returned value.
+    - `op`: a lambda function of type `to_field<A>` → `tuple<B,A>`.
+    - *returns:* a the value of type `B` in the first element of the tuple returned by the application of `op` to the neighbouring field with a default value coinciding with the default of `x0`, and custom values that are the most recent values for the current device sent by neighbours through the second element of the tuple returned by `op` on their round (including the previous round of the current device, if there was one).
+
+Note that the first two forms return a `to_field<A>` value, as explained in *Basic types* above, while the 3rd and 4th forms, instead, return a plain `A` (resp. `B`) value. All the returned values can then be used in further computations during the current round. At the end of the round, all forms cause the FCPP library to send to the neighbouring devices the computed `A` value associated with the current device, that for the 1st and 2nd forms is the last argument itself, while for the 3rd and 4th forms is obtained from the result of `op`. When using any of these forms, the corresponding type `A` should be included in the `export_list`.
+
+#### Network partitioning
+
+It is possible to split the computation into independent sub-networks through the following construct.
+```
+A split(ARGS, T&& key, G&& op)
+```
+- `key`: a value of any type identifying the sub-networks.
+- `op`: a lambda function of type `()` → `A`.
+- *returns:* the value returned by the application of `op`.
+
+In this construct, the application of `op` is performed in isolation on every sub-network depending on the value of `key`. Thus, every communication (with e.g. `nbr`) occurring inside `op` will only consider neighbours sharing the same `key` value, and not those with a different `key` value. Notice that `split` does not require to add any export to the `export_list`.
+
+#### Aggregate processes
 
 The spawn function.
 
