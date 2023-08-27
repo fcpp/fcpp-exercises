@@ -225,6 +225,7 @@ The exact sizes of these types depends on the specific configuration under which
 
 Other general purpose types are provided to handle graphics and physics (see the [API reference](http://fcpp-doc.surge.sh/dir_a649fd95b532dff35a9ca005b15ee438.html)):
 - `color` to store and manipulate color information;
+- `ordered` to add trivial ordering to any given type;
 - `shape` to represent drawable shapes;
 - `tuple` as a boosted version of `std::tuple`;
 - `vec` to store and manipulate physical vectors.
@@ -243,6 +244,8 @@ The field class is also designed to interplay with `tuple`, so that a tuple of f
 to_local<tuple<field<real_t>, field<device_t>, device_t> == tuple<real_t, device_t, device_t>
 ```
 A similar `to_field<T>` is also provided as a shorthand to `field<to_local<T>>`.
+
+FCPP also provides a few more sophisticated types: `bloom` implementing a [bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) and `hyperloglog` implementing an [HyperLogLog counter](https://en.wikipedia.org/wiki/HyperLogLog).
 
 ### Coordination operators
 
@@ -342,11 +345,31 @@ In this construct, the application of `op` is performed in isolation on every su
 
 #### Aggregate processes
 
-The spawn function.
+FCPP also supports the concept of [_aggregate process_](https://link.springer.com/chapter/10.1007/978-3-031-35361-1_4). An aggregate process is an aggregate function that can be instantiated zero or more times by each device. Each process instance corresponds to a different _process key_, and runs that correspond to different keys do not interact with each other, while evolving in space in time jumping between devices until the _termination_ of the process instance. FCPP features three variations of aggregate processes, all conforming to the following signature:
+```
+std::unordered_map<K, R, common::hash<K>> spawn(ARGS, G&& process, S&& key_set, Ts const&... xs)
+```
+- `process`: an aggregate function of type `(K, Ts...)` → `tuple<R,B>`, where `K` is the process key type, `Ts` are the types of extra arguments to be passed to each process instance, `R` is the type of the value returned by the instance, and `B` is the status returned by the instance.
+- `key_set`: an interable collection of process keys that the device should run.
+- `xs`: extra arguments passed to each process instance.
+- *returns:* a map from process keys to the returned values by the instances.
+
+The variations of spawn differ by the status type `B`, which can be:
+- `bool`: in which case, `true` means that the process should expand while `false` means that the process should not expand further;
+- `field<bool>`: in which case, the neighbouring field dictates to exactly which neighbours the process should expand;
+- `status`: in which case, a status of `terminated` can propagate causing the process to terminate, `border` stops the propagation (as `false`), `internal` allows propagation, and variants ending with `_output` cause the value produced to be inserted in the resulting unordered map.
 
 ### Coordination library
 
-Presentation of the various coordination headers to ease function lookup.
+Several aggregate function of general utility are available in the FCPP standard coordination library, which is grouped in headers with different scope:
+
+- [basics.hpp](http://fcpp-doc.surge.sh/basics_8hpp.html): contains `old`, `nbr`, `spawn`, and other basic aggregate functions that are not defined from other aggregate functions.
+- [collection.hpp](http://fcpp-doc.surge.sh/collection_8hpp.html): contains routines to collect information from the network into a single sink point.
+- [election.hpp](http://fcpp-doc.surge.sh/election_8hpp.html): contains algorithms for breaking symmetry and electing one or more leaders in a network. 
+- [geometry.hpp](http://fcpp-doc.surge.sh/geometry_8hpp.html): contains functions pertaining to movement and physical displacement of devices.
+- [spreading.hpp](http://fcpp-doc.surge.sh/spreading_8hpp.html): contains algorithms based on information spreading, such as distance estimation, gossip and broadcast.
+- [time.hpp](http://fcpp-doc.surge.sh/time_8hpp.html): contains routines handling the variation of data in time on each device.
+- [utils.hpp](http://fcpp-doc.surge.sh/utils_8hpp.html): contains useful aggregate functions of general purpose.
 
 
 ## System Setup
