@@ -40,7 +40,7 @@ constexpr size_t communication_range = 100;
 // [AGGREGATE PROGRAM]
 
 /**
- * EXERCISES:
+ * BASE EXERCISES:
  *
  * Expand the MAIN function below to compute the following:
  *
@@ -61,7 +61,7 @@ constexpr size_t communication_range = 100;
  * (together with the corresponding data type) in the `tuple_store` option below.
  *
  *
- * BONUS EXERCISES:
+ * SIMULATION PHYSIC:
  *
  * 5)    Move away from the neighbour with the highest number of neighbours.
  *
@@ -85,6 +85,21 @@ constexpr size_t communication_range = 100;
  * -    In the last two exercises, you can model attraction/repulsion using the classical inverse square law.
  *      More precisely, if `v` is the vector between two objects, the resulting force is `v / |v|^3` where
  *      `|v| = sqrt(v_x^2 + v_y^2)`. In FCPP, `norm(v)` is available for computing `|v|`.
+ *
+ *
+ * USING API:
+ *
+ * 7)   Share the maximum number of neighbor devices ever witnessed by any device in the network 
+ *      with neighbors within 10 hops.
+ *
+ * 8)   Calculate the minimum distance from any node to a node named "source" using the abf_distance function 
+ *      and share with neighbors within 10 hops.
+ *
+ * HINTS:
+ *
+ * -    FCPP provides some built-in APIs, like "diameter_election" and "abf_distance".
+ * 
+ * -    Refer to the documentation.
  */
 
 
