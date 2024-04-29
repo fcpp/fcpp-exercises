@@ -89,17 +89,18 @@ constexpr size_t communication_range = 100;
  *
  * USING API:
  *
- * 7)   Share the maximum number of neighbor devices ever witnessed by any device in the network 
+ * 7)   Share the maximum number of neighbour devices ever witnessed by any device in the network 
  *      with neighbors within 10 hops.
  *
- * 8)   Calculate the minimum distance from any node to a node named "source" using the abf_distance function 
- *      and share with neighbors within 10 hops.
+ * 8)   Calculate the minimum distance from any node to a node named "source" using the "abf_distance" function 
+ *      and share it with neighbours within 10 hops.
  *
  * HINTS:
  *
- * -    FCPP provides some built-in APIs, like "diameter_election" and "abf_distance".
+ * -    FCPP provides some built-in APIs, like "diameter_election" and "abf_distance". 
+ *      Refer to the documentation.
  * 
- * -    Refer to the documentation.
+ * -    The node called "source" can be fixed or chosen by network finding the node with minimum uid.
  */
 
 
