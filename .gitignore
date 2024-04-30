@@ -5,5 +5,7 @@ bin/
 doc/
 output/
 plot/
+build/
 .vagrant/
 .DS_Store
+.vscode/

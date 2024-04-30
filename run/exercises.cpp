@@ -40,7 +40,7 @@ constexpr size_t communication_range = 100;
 // [AGGREGATE PROGRAM]
 
 /**
- * EXERCISES:
+ * BASE EXERCISES:
  *
  * Expand the MAIN function below to compute the following:
  *
@@ -54,14 +54,8 @@ constexpr size_t communication_range = 100;
  *
  * Every exercise above is designed to help solving the following one.
  *
- * In order to check whether what you computed is correct, you may display the computed
- * quantities as node qualities through tags `node_color`, `node_size` and `node_shape`.
- * You can also save your computed quantities in additional specific node attributes:
- * towards this end, you should both add a tag in namespace tags above, then list it
- * (together with the corresponding data type) in the `tuple_store` option below.
  *
- *
- * BONUS EXERCISES:
+ * SIMULATION PHYSICS:
  *
  * 5)    Move away from the neighbour with the highest number of neighbours.
  *
@@ -70,6 +64,21 @@ constexpr size_t communication_range = 100;
  *
  * 7)    Move as if the device was repulsed by every neighbour, and by the four walls of the
  *       rectangular box between points [0,0] and [500,500].
+ *
+ *
+ * COMBINING SPATIAL COMPUTING BLOCKS:
+ *
+ * 7)   Select a node called "source", chosen by finding the node with minimum uid 
+ *      in the network, assuming that the diameter of the network is no more than 10 hops.
+ *
+ * 8)   Compute the distances between any node and the "source" using the adaptive bellman-ford algorithm.
+ *
+ *
+ * In order to check whether what you computed is correct, you may display the computed
+ * quantities as node qualities through tags `node_color`, `node_size` and `node_shape`.
+ * You can also save your computed quantities in additional specific node attributes:
+ * towards this end, you should both add a tag in namespace tags above, then list it
+ * (together with the corresponding data type) in the `tuple_store` option below.
  *
  * HINTS:
  *
@@ -82,9 +91,12 @@ constexpr size_t communication_range = 100;
  * -    Coordinates are available through `node.position()`. Coordinates can be composed as physical
  *      vectors: `[1,3] + [2,-1] == [3,2]`, `[2,4] * 0.5 == [1,2]`.
  *
- * -    In the last two exercises, you can model attraction/repulsion using the classical inverse square law.
+ * -    In the simulation physics exercises, you can model attraction/repulsion using the classical inverse square law.
  *      More precisely, if `v` is the vector between two objects, the resulting force is `v / |v|^3` where
  *      `|v| = sqrt(v_x^2 + v_y^2)`. In FCPP, `norm(v)` is available for computing `|v|`.
+ *
+ * -    FCPP provides some built-in APIs, like "diameter_election" and "abf_distance". 
+ *      Refer to the documentation: https://fcpp-doc.surge.sh
  */
 
 
