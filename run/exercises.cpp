@@ -68,11 +68,10 @@ constexpr size_t communication_range = 100;
  *
  * COMBINING SPATIAL COMPUTING BLOCKS:
  *
- * 7)   Determine the node called "source", chosen by finding the node with minimum uid 
- *      in the network from neighbors within 10 hops.
+ * 7)   Select a node called "source", chosen by finding the node with minimum uid 
+ *      in the network, assuming that the diameter of the network is no more than 10 hops.
  *
- * 8)   Compute the distance from any node to the "source" using the "abf_distance" function.
- *      Determine the minimum of such distances in neighbours within 10 hops.
+ * 8)   Compute the distances between any node and the "source" using the adaptive bellman-ford algorithm.
  *
  *
  * In order to check whether what you computed is correct, you may display the computed
@@ -98,7 +97,6 @@ constexpr size_t communication_range = 100;
  *
  * -    FCPP provides some built-in APIs, like "diameter_election" and "abf_distance". 
  *      Refer to the documentation: https://fcpp-doc.surge.sh
- * 
  */
 
 
