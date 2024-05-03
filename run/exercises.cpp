@@ -68,10 +68,10 @@ constexpr size_t communication_range = 100;
  *
  * COMBINING SPATIAL COMPUTING BLOCKS:
  *
- * 7)   Select a node called "source", chosen by finding the node with minimum uid 
+ * 8)   Select a node called "source", chosen by finding the node with minimum uid 
  *      in the network, assuming that the diameter of the network is no more than 10 hops.
  *
- * 8)   Compute the distances between any node and the "source" using the adaptive bellman-ford algorithm.
+ * 9)   Compute the distances between any node and the "source" using the adaptive bellman-ford algorithm.
  *
  *
  * In order to check whether what you computed is correct, you may display the computed
