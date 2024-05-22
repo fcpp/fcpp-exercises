@@ -73,6 +73,11 @@ constexpr size_t communication_range = 100;
  *
  * 9)   Compute the distances between any node and the "source" using the adaptive bellman-ford algorithm.
  *
+ * 10)  Calculate in the source an estimate of the true diameter of the network
+ *      (the maximum distance of a device in the network).
+ *
+ * 11)  Broadcast the diameter to every node in the network.
+ *
  *
  * In order to check whether what you computed is correct, you may display the computed
  * quantities as node qualities through tags `node_color`, `node_size` and `node_shape`.
