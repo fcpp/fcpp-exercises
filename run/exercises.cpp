@@ -79,6 +79,21 @@ constexpr size_t communication_range = 100;
  * 11)  Broadcast the diameter to every node in the network.
  *
  *
+ * RUNTIME MONITORING:
+ * 
+ * Given that:
+ * - some nodes are Internet Gateways (gateway),
+ * - a node is at risk of disconnection (disrisk) iff it has less than three neighbours,
+ * monitor the following properties:
+ * 
+ * 12)  You (the current device) have never been at disrisk.
+ * 
+ * 13)  In the network, there exists a node that has never been at disrisk.
+ * 
+ * 14)  You (the current device) can always reach a gateway through nodes that are not at disrisk.
+ * 
+ * 15)  You (the current device) can always reach a gateway through nodes that have never been at disrisk.
+ * 
  * In order to check whether what you computed is correct, you may display the computed
  * quantities as node qualities through tags `node_color`, `node_size` and `node_shape`.
  * You can also save your computed quantities in additional specific node attributes:
@@ -104,8 +119,18 @@ constexpr size_t communication_range = 100;
  *      Refer to the documentation: https://fcpp-doc.surge.sh
  */
 
+/*
+ * @brief example function for checking a property. 
+ * Sample property: you (the current device) have not been at disrisk for a couple of rounds.
+ */
+FUN bool recent_dis_monitor(ARGS, bool disrisk) { CODE
+    using namespace logic;
+    bool prev_disrisk = Y(CALL, disrisk);
+    return !disrisk & !prev_disrisk;
+}
+FUN_EXPORT monitor_t = export_list<past_ctl_t, slcs_t>;
 
-//! @brief Main function.
+// @brief Main function.
 MAIN() {
     // import tag names in the local scope.
     using namespace tags;
@@ -130,7 +155,7 @@ MAIN() {
     node.storage(node_shape{}) = shape::sphere;
 }
 //! @brief Export types used by the main function (update it when expanding the program).
-FUN_EXPORT main_t = export_list<double, int>;
+FUN_EXPORT main_t = export_list<double, int, monitor_t>;
 
 } // namespace coordination
 
