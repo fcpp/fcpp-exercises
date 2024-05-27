@@ -82,7 +82,7 @@ constexpr size_t communication_range = 100;
  * RUNTIME MONITORING:
  * 
  * Given that:
- * - some nodes are Internet Gateways (gateway),
+ * - the node(s) identified as "source" in exercise (8) are Internet Gateways (gateway),
  * - a node is at risk of disconnection (disrisk) iff it has less than three neighbours,
  * monitor the following properties:
  * 
