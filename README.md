@@ -47,6 +47,11 @@ In Fedora, the `xorg-dev` package is not available. Instead, install the package
 ```
 libX11-devel libXinerama-devel.x86_6 libXcursor-devel.x86_64 libXi-devel.x86_64 libXrandr-devel.x86_64 mesa-libGL-devel.x86_64
 ```
+In Arch Linux, you can instead install the packages as follows:
+```
+sudo pacman -S xorg-server-devel gcc cmake
+yay -S asymptote
+```
 
 ### MacOS
 
