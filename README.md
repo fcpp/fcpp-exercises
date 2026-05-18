@@ -43,10 +43,24 @@ To install these packages in Ubuntu, type the following command:
 ```
 sudo apt-get install xorg-dev g++ cmake asymptote
 ```
+
+If you are using Wayland the following additional packages must be installed:
+```
+sudo apt-get install libwayland-dev libxkbcommon-dev
+```
+
 In Fedora, the `xorg-dev` package is not available. Instead, install the packages:
 ```
-libX11-devel libXinerama-devel.x86_6 libXcursor-devel.x86_64 libXi-devel.x86_64 libXrandr-devel.x86_64 mesa-libGL-devel.x86_64
+libX11-devel libXinerama-devel.x86_64 libXcursor-devel.x86_64 libXi-devel.x86_64 libXrandr-devel.x86_64 mesa-libGL-devel.x86_64
 ```
+
+Additionally for Wayland on Fedora you'll need the following packages:
+```
+wayland-devel libxkbcommon-devel
+```
+
+More detail on dependencies for distribution using Wayland are available at the following [link](https://www.glfw.org/docs/latest/compile_guide.html#compile_deps_wayland).
+
 In Arch Linux, you can instead install the packages as follows:
 ```
 sudo pacman -S xorg-server-devel gcc cmake
